@@ -1,19 +1,48 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
 #       jupytext_version: 1.19.3
 #   kernelspec:
-#     display_name: .venv
+#     display_name: .venv (3.14.4)
 #     language: python
 #     name: python3
 # ---
 
 # %% [markdown] id="0rq-l19mEOdL"
 # # Demo: HTTP and Networked Programs
+
+# %% [markdown]
+# ## Demo Part 0: HTTP
+#
+# ```bash
+# echo '<h1>Hello HTTP</h1><p>This page comes from a local server.</p><p><a href="page2.html">Go to Page 2</a></p>' > index.html
+#
+# echo '<h1>This is Page 2</h1><p>You opened this page through a link or direct URL.</p><p><a href="index.html">Back to Home</a></p>' > page2.html
+#
+# python3 -m http.server 8000
+# ```
+
+# %% [markdown]
+# ## Demo Part 0.5: Sockets
+
+# %%
+import socket as sc
+
+s = sc.socket()
+s.connect(("google.com", 80))
+print("Đã kết nối.")
+s.send(b"GET / HTTP/1.1\r\nHost: google.com\r\n\r\n")
+
+response = s.recv(3000) # Nhận tối đa 3000 bytes
+print(response.decode())
+
+print("Đang đóng kết nối.")
+s.close()
 
 # %% [markdown] id="vemk5ewZDqKT"
 # ## Demo Part 1: "Hacking" HTTP with Bash
@@ -22,14 +51,14 @@
 #
 # Linux Bash Command:
 #
-# ```
+# ```bash
 # # Use telnet to manually connect to a web server on port 80
 # telnet data.pr4e.org 80
 # ```
 #
 # Once connected, type the following (and press Enter twice):
 #
-# ```
+# ```bash
 # GET http://data.pr4e.org/romeo.txt HTTP/1.0
 # ```
 #
@@ -51,6 +80,7 @@ mysock.connect(('data.pr4e.org', 80))
 
 # Prepare the GET command (must be encoded to bytes)
 cmd = 'GET http://data.pr4e.org/romeo.txt HTTP/1.0\r\n\r\n'.encode()
+# cmd = 'GET http://data.pr4e.org/romeo.txt HTTP/1.0\n\r\n\r'.encode()
 mysock.send(cmd)
 
 while True:
@@ -129,7 +159,7 @@ ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-url = input('Enter URL - ') # e.g. https://www.dr-chuck.com/
+url = 'https://www.dr-chuck.com/'
 html = urllib.request.urlopen(url, context=ctx).read()
 soup = BeautifulSoup(html, 'html.parser')
 
@@ -139,6 +169,48 @@ for tag in tags:
     print(tag.get('href', None))
 
 
+# %% [markdown]
+# ### Đi theo link qua nhiều trang
+
+# %%
+url = 'http://py4e-data.dr-chuck.net/known_by_Fikret.html'
+for i in range(4):
+    html = urllib.request.urlopen(url).read()
+    soup = BeautifulSoup(html, 'html.parser')
+    url = soup('a')[2].get('href')       # lấy link thứ 3
+    print('Đi tới:', url)
+
+# %% [markdown]
+# ### Trích dữ liệu từ các thẻ
+
+# %%
+url = 'http://py4e-data.dr-chuck.net/comments_42.html'
+html = urllib.request.urlopen(url).read()
+soup = BeautifulSoup(html, 'html.parser')
+
+nums = [int(tag.contents[0]) for tag in soup('span')]
+
+for tag in soup('span'):
+    print(tag.contents)
+print(nums)
+print('Số lượng:', len(nums), '| Tổng:', sum(nums))
+
+# %%
+url = "https://quotes.toscrape.com/"
+html = urllib.request.urlopen(url).read()
+soup = BeautifulSoup(html, 'html.parser')
+
+quotes = soup('div', class_ = 'quote')
+# quotes = soup('span')
+# print(quotes)
+# print(type(quotes))
+for quote in quotes:
+    # text = quote.find('span', class_ = 'text')
+    # author = quote.find('small', class_ = 'author')
+    text = quote.find('span', class_ = 'text')
+    author = quote.find('small', class_ = 'author')
+    print(f'{text} - {author}')
+
 # %% [markdown] id="e0ZK0LXOHRIn"
 # ## Demo Part 6: Bash Alternatives (curl & wget)
 #
@@ -146,7 +218,7 @@ for tag in tags:
 #
 # Linux Bash Commands:
 #
-# ```
+# ```bash
 # # Use curl to download a file and save it locally
 # curl -O http://www.py4e.com/cover.jpg
 #

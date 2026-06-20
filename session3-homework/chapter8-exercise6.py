@@ -11,3 +11,5 @@ while True:
 
 print('Maximum:', max(numbers))
 print('Minimum:', min(numbers))
+if len(numbers) > 0:
+    print('Average:', sum(numbers) / len(numbers))
