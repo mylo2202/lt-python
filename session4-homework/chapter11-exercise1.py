@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 
-DATA_FILE = Path(__file__).resolve().parents[1] / "session3-homework" / "mbox.txt"
+DATA_FILE = Path(__file__).resolve().parent / "mbox.txt"
 
 regex = input("Enter a regular expression: ")
 count = 0

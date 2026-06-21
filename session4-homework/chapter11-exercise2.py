@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "session3-homework"
+DATA_DIR = Path(__file__).resolve().parent
 
 
 def resolve_filename(filename):
