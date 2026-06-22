@@ -24,7 +24,17 @@ def resolve_filename(filename):
 
 
 filename = input("Enter file:")
+# nếu nhập khoảng trắng hoặc để trống thì báo lỗi và dừng luôn
+if not filename.strip():
+    print("Error: Filename cannot be empty or contain only whitespace.")
+    exit()
+
 path = resolve_filename(filename)
+# check trường hợp nhập file không tồn tại hoặc là thư mục
+if not path.is_file():
+    print("File cannot be opened:", filename)
+    exit()
+
 revision_numbers = []
 
 try:
@@ -35,6 +45,9 @@ try:
                 revision_numbers.append(int(match))
 except FileNotFoundError:
     print("File cannot be opened:", filename)
+except PermissionError:
+    # trường hợp file tồn tại nhưng user không có quyền đọc
+    print("Permission denied:", filename)
     exit()
 
 if len(revision_numbers) == 0:
