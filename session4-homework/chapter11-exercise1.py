@@ -13,16 +13,23 @@ DATA_FILE = Path(__file__).resolve().parent / "mbox.txt"
 regex = input("Enter a regular expression: ")
 count = 0
 
+if regex.strip() == "":
+    print("Invalid regular expression:", regex)
+    exit()
+
+try:
+    pattern = re.compile(regex)
+except re.error:
+    print("Invalid regular expression:", regex)
+    exit()
+
 try:
     with DATA_FILE.open("r", encoding="utf-8") as fhand:
         for line in fhand:
-            if re.search(regex, line):
+            if pattern.search(line):
                 count += 1
 except FileNotFoundError:
     print("File cannot be opened:", DATA_FILE)
-    exit()
-except re.error:
-    print("Invalid regular expression:", regex)
     exit()
 
 print(f"mbox.txt had {count} lines that matched {regex}")
